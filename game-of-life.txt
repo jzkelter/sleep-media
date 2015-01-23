@@ -1,3 +1,13 @@
+;This is the setup procedure
+to breishis 
+
+make "hours-in-day 16
+
+end
+
+
+
+
 to play-game
 launch [ forever [move-char 5] ]
 launch [forever [wait 50 / level spawn_more]]
@@ -39,3 +49,24 @@ to show-ascii
 let [key readchar]
     show ascii :key
 end
+
+
+
+
+;turtle chases the chasee with speed :speed
+to chase :chasee :speed
+
+towards :chasee             ;turn towards the chasee
+
+let [dis distance :chasee]      ; get distance to chasee
+ifelse (:speed > :dis)      ; if the turtle is close than speed
+    [fd :dis ]              ; then move to the turtle
+    [fd :speed]         ;if not, move foward speed
+
+end
+
+
+
+
+
+
