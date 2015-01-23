@@ -1,41 +1,31 @@
+;This is the setup procedure
+to breishis 
+make "hours-in-day 16
+
+
+end
+
+
+
+to chase :chasee :speed
+;turtle chases the chasee with speed :speed
+
+towards :chasee             ;turn towards the chasee
+
+let [dis distance :chasee]      ; get distance to chasee
+ifelse (:speed > :dis)      ; if the turtle is close than speed
+    [fd :dis ]              ; then move to the turtle
+    [fd :speed]         ;if not, move foward speed
+
+end
+
+
+
+
+
 to play-game
-launch [ forever [move-char 5] ]
-launch [forever [wait 50 / level spawn_more]]
+    launch [forever [ask "t1 [wait 1 chase "t2 5 ]]]
+
 end
 
 
-
-;moves the char in a certain heading a certain distance :speed
-to move-char :speed
-let [key readchar]
-if (ascii :key) = 28        ;;if left arrow key is pressed
-    [seth 270 fd :speed]
-if (ascii :key) = 29        ;;if right arrow key is pressed
-    [seth 90 fd :speed]
-if (ascii :key) = 30        ;;if forward key is pressed
-    [seth 0 fd :speed]
-if (ascii :key) = 31        ;;if left arrow key is pressed
-    [seth 180 fd :speed]
-end
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;HELPER FUNCTIONS;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-to spawn-good
-newturtle
-setx (random 350) - 350
-sety (random 200) - 200
-setsh pick [1 2 3 4]
-st
-end
-
-; for finding ascii-key values
-to show-ascii
-let [key readchar]
-    show ascii :key
-end
