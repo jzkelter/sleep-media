@@ -1,0 +1,141 @@
+to startup
+presentationmode
+intro
+zombierun
+instructions
+wait 100
+OpeningPage
+end
+
+to quit
+PlayPage
+everyone[remove who]
+setlevel 1
+setlose? "false
+OpeningPage
+end
+
+to spawn_first_turtle
+importturtle "t1
+home
+st
+end
+
+to lose_game
+setlose? "true
+t1, launch[forever [rt 1 wait .001]]
+launch[melody2]
+gameovervideo
+gameover
+losepage
+stopall
+end
+
+to try_again
+setlevel 1
+wait 10
+PlayPage
+everyone[remove who]
+setlose? "false
+game level
+end
+
+to New_Game
+wait 10
+PlayPage
+game
+end
+
+to next_level
+wait 10
+game
+end
+
+
+to win_game
+WinPage
+setlevel 1
+applause
+stopall
+end
+
+to win_level
+announce sentence [you win level] level
+setlevel level + 1
+everyone[remove who]
+set "NextLevel "visible? "true
+stopall
+end
+
+
+to game
+when [level > 5] [WinPage]
+set "NextLevel "visible? "false
+spawn_first_turtle
+launch[animate_turtle 1]
+launch[forever[direct_heading]]
+melody1
+spawn_follower
+launch [forever [wait 50 / level spawn_more]]
+wait level * 100
+if lose? = "false [win_level]
+end
+
+to direct_heading
+let [key readchar]
+if (:key) = "a
+    [seth 270]
+if (:key) = "w
+    [seth 0]
+if ( :key) = "d
+    [seth 90]
+if ( :key) = "s
+    [seth 180]
+end
+
+
+to animate_turtle :speed
+tto "t1
+launch [forever [fd 5 * :speed wait .5]]
+end
+
+to spawn_follower
+spawn_ff
+forever [follow "t1 5 5 wait .5]
+end
+
+to spawn_ff
+importturtle "t3
+st
+end
+
+to spawn_more
+clone "t3
+setx random 200
+sety random 200
+st
+wait 3
+forever [follow "t1 5 5 wait .5]
+end
+
+to follow :t :dist :angle
+let [ dir direction-of :t ]
+if (not :dir = 0) [
+    let [sign :dir / (abs :dir)]
+    if (or (:dir > 180) (:dir < -180)) [
+        make "sign (0 - :sign)
+    ]
+    rt (:sign * :angle)
+]
+fd :dist
+end
+
+to direction-of :t
+let [h heading]
+towards :t
+let [new-h heading]
+seth :h
+output :new-h - :h
+end
+
+
