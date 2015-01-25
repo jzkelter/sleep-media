@@ -6,6 +6,7 @@ make "secs-in-hour 2
 change-clock ;;reset the clock
 resett
 
+make-energy&happiness-bars
 
 end
 
@@ -139,3 +140,66 @@ repeat count clock [delete]     ;delete all text
 insert (se :hours-left "hours "left ;insert new text
 end
 ;;;;;;;;;;;END CLOCK PROCEDURES ;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
+to make-energy-happiness-bars
+newturtle "energy
+setx -285
+sety 200
+setc 85
+st
+rt 90
+setpensize 25
+pd
+fd 500
+
+newturtle "happy
+setx -285
+sety 170
+setc 45
+st 
+rt 90
+setpensize 25
+pd
+fd 100
+
+end
+
+
+to increase-happiness :ammount
+ask "happy [
+    setc 45
+    fd :ammount
+]
+end
+
+
+to decrease-happiness :ammount
+ask "happy [
+    setc 0
+    bk :ammount + 1
+]
+increase-happiness 1
+end
+
+
+to increase-energy :ammount
+ask "energy [
+    setc 85
+    fd :ammount
+]
+end
+
+
+to decrease-energy :ammount
+ask "energy [
+    setc 0
+    bk :ammount + 1
+]
+increase-energy 1
+end
+
+
+;;;;;;;;;;;;;;;;END ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
