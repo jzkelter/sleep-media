@@ -15,7 +15,6 @@ end
 to play-game
 breishis
 launch [ forever [move-char 5] ]
-spawn-creatures
 launch [ forever [ keep-time ] ]
 end
 
