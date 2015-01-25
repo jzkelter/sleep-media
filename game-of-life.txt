@@ -118,7 +118,7 @@ end
 
 ;Changes the time, and then changes the clock in the world
 to keep-time
-	wait (:secs-in-hour * 10) 
+	wait (:secs-in-hour * 10)
 	make "hours-left (:hours-left - 1) 		;increment time
 	change-clock						;change clock text
 
@@ -126,7 +126,7 @@ to keep-time
 		announce [the day is over]
 		stopall
 	]
-end 
+end
 
 
 to change-clock
