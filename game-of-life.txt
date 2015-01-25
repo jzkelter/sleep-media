@@ -146,7 +146,7 @@ end
 ;;;;;;;;;;;;;;;;ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
 to make-energy-happiness-bars
 newturtle "energy
-setx -285
+setx -367
 sety 200
 setc 85
 st
@@ -156,14 +156,14 @@ pd
 fd 500
 
 newturtle "happy
-setx -285
+setx -367
 sety 170
 setc 45
 st 
 rt 90
 setpensize 25
 pd
-fd 100
+fd 150
 
 end
 
