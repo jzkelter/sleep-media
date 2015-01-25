@@ -13,6 +13,7 @@ end
 
 
 to play-game
+spawn-creatures
 launch [ forever [move-char 5] ]
 ; launch [forever [wait 50 / level spawn_more]]
 launch [forever [ask "t1 [wait 1 chase "t2 5] ] ]
@@ -42,7 +43,9 @@ end
 ;;HELPER FUNCTIONS;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+to spawn-creatures
 
+end
 
 
 ; spawns an intial good turtle which will be cloned
@@ -71,9 +74,9 @@ to spawn-initial-bad
 newturtle "bad
 setx random 735     ;random from 0-734 which is world size
 sety random 427
-setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
+setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which represent good things
 giveturtle "type
-settype "good       ;give the turtle a good type
+settype "bad        ;give the turtle a good type
 st
 end
 
@@ -82,8 +85,8 @@ to spawn-more-bad
 clone "bad
 setx random 735     ;random from 0-734 which is world size
 sety random 427
-setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
-settype "good       ;give the turtle a good type
+setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which represent good things
+settype "bad        ;give the turtle a good type
 st
 end
 
