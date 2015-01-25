@@ -1,7 +1,11 @@
 ;This is the setup procedure
 to breishis
 
-make "hours-in-day 16
+make "hours-left 16
+make "secs-in-hour 2
+change-clock ;;reset the clock
+resett
+
 
 end
 
@@ -10,7 +14,10 @@ end
 
 to play-game
 launch [ forever [move-char 5] ]
-launch [forever [wait 50 / level spawn_more]]
+; launch [forever [wait 50 / level spawn_more]]
+launch [forever [ask "t1 [wait 1 chase "t2 5] ] ]
+launch [ forever [ keep-time ] ]
+
 end
 
 
@@ -82,7 +89,6 @@ end
 
 
 
-
 ; for finding ascii-key values
 to show-ascii
 let [key readchar]
@@ -91,21 +97,38 @@ end
 
 
 
-
 ;turtle chases the chasee with speed :speed
 to chase :chasee :speed
 
-towards :chasee             ;turn towards the chasee
+towards :chasee 			;turn towards the chasee
 
-let [dis distance :chasee]      ; get distance to chasee
-ifelse (:speed > :dis)      ; if the turtle is close than speed
-    [fd :dis ]              ; then move to the turtle
-    [fd :speed]         ;if not, move foward speed
+let [dis distance :chasee] 		; get distance to chasee
+ifelse (:speed > :dis) 		; if the turtle is close than speed
+	[fd :dis ]				; then move to the turtle
+	[fd :speed]			;if not, move foward speed
 
 end
 
 
 
+;;;;;;;;CLOCK PROCEDURES;;;;;;;;;;;;;;;;;
+
+;Changes the time, and then changes the clock in the world
+to keep-time
+	wait (:secs-in-hour * 10) 
+	make "hours-left (:hours-left - 1) 		;increment time
+	change-clock						;change clock text
+
+	if (:hours-left = 0) [
+		announce [the day is over]
+		stopall
+	]
+end 
 
 
-
+to change-clock
+top							;move cursoe to top of page
+repeat count clock [delete]		;delete all text
+insert (se :hours-left "hours "left	;insert new text
+end
+;;;;;;;;;;;END CLOCK PROCEDURES ;;;;;;;;;;;;;;;;;;
