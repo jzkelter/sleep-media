@@ -1,10 +1,11 @@
 ;This is the setup procedure
 to breishis 
 
-make "hours-left 18
+make "hours-left 16
 make "secs-in-hour 2
 change-clock ;;reset the clock
 resett
+
 
 end
 
