@@ -1,5 +1,5 @@
 ;This is the setup procedure
-to breishis 
+to breishis
 
 make "hours-in-day 16
 
@@ -36,13 +36,52 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-to spawn-good
-newturtle
-setx (random 350) - 350
-sety (random 200) - 200
-setsh pick [1 2 3 4]
+
+
+; spawns an intial good turtle which will be cloned
+to spawn-initial-good
+newturtle "good
+setx random 735     ;random from 0-734 which is world size
+sety random 427
+setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
+giveturtle "type
+settype "good       ;give the turtle a good type
 st
 end
+
+; spawns more good turtles
+to spawn-more-good
+clone "good
+setx random 735     ;random from 0-734 which is world size
+sety random 427
+setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
+settype "good       ;give the turtle a good type
+st
+end
+
+; spawns an intial good turtle which will be cloned
+to spawn-initial-bad
+newturtle "bad
+setx random 735     ;random from 0-734 which is world size
+sety random 427
+setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
+giveturtle "type
+settype "good       ;give the turtle a good type
+st
+end
+
+; spawns more good turtles
+to spawn-more-bad
+clone "bad
+setx random 735     ;random from 0-734 which is world size
+sety random 427
+setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
+settype "good       ;give the turtle a good type
+st
+end
+
+
+
 
 ; for finding ascii-key values
 to show-ascii
