@@ -6,7 +6,7 @@ make "secs-in-hour 2
 change-clock ;;reset the clock
 resett
 
-
+make-energy-happiness-bars
 end
 
 
@@ -22,16 +22,19 @@ end
 
 ;moves the char in a certain heading a certain distance :speed
 to move-char :speed
+if key? [
 main-char,
-let [key readchar]
-if (ascii :key) = 28        ;;if left arrow key is pressed
-    [seth 270 fd :speed]
-if (ascii :key) = 29        ;;if right arrow key is pressed
-    [seth 90 fd :speed]
-if (ascii :key) = 30        ;;if forward key is pressed
-    [seth 0 fd :speed]
-if (ascii :key) = 31        ;;if left arrow key is pressed
-    [seth 180 fd :speed]
+    let [key readchar]
+    if (ascii :key) = 28        ;;if left arrow key is pressed
+        [seth 270 fd :speed]
+    if (ascii :key) = 29        ;;if right arrow key is pressed
+        [seth 90 fd :speed]
+    if (ascii :key) = 30        ;;if forward key is pressed
+        [seth 0 fd :speed]
+    if (ascii :key) = 31        ;;if left arrow key is pressed
+        [seth 180 fd :speed]
+]
+fd :speed
 end
 
 
@@ -176,3 +179,64 @@ repeat count clock [delete]     ;delete all text
 insert (se :hours-left "hours "left ;insert new text
 end
 ;;;;;;;;;;;END CLOCK PROCEDURES ;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
+to make-energy-happiness-bars
+newturtle "energy-tracker
+setx -367
+sety 200
+setc 85
+st
+rt 90
+setpensize 25
+pd
+fd 500
+
+newturtle "happy-tracker
+setx -367
+sety 170
+setc 45
+st
+rt 90
+setpensize 25
+pd
+fd 150
+
+end
+
+
+to increase-happiness :ammount
+ask "happy-tracker [
+    setc 45
+    fd :ammount
+]
+end
+
+
+to decrease-happiness :ammount
+ask "happy-tracker [
+    setc 0
+    bk :ammount + 1
+]
+increase-happiness 1
+end
+
+
+to increase-energy :ammount
+ask "energy-tracker [
+    setc 85
+    fd :ammount
+]
+end
+
+
+to decrease-energy :ammount
+ask "energy-tracker [
+    setc 0
+    bk :ammount + 1
+]
+increase-energy 1
+end
+
+
+;;;;;;;;;;;;;;;;END ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
