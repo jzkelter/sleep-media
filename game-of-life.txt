@@ -51,8 +51,8 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;BEGIN SPAWN PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to spawn-creatures
 spawn-you
-spawn-good 1        ;Spawns 1 + number you enter good creatues with type good
-spawn-bad 1     ;Spawns 1 + number you enter bad creatues with type bad
+spawn-num-good 2        ;Spawns 1 + number you enter good creatues with type good
+spawn-num-bad 2     ;Spawns 1 + number you enter bad creatues with type bad
 end
 
 
@@ -62,77 +62,50 @@ newturtle "main-char
 setx 0
 sety 0
 st
-giveturtle "energy
-giveturtle "happiness
-;when [touching? who ] [affect-me]
 end
 
-to affect-me
-[if turtle = good
-        [add-happy
-        add-energy
-        remove-good
-    ]
-    else
-]
+to do-good
+announce [Good has been done!]
+remove who
+end
+
+to do-bad
+announce [Bad has been done]
+remove who
 end
 
 ;Spawns good characters
-to spawn-good :num-good
-spawn-initial-good
-repeat :num-good [spawn-more-good]
+to spawn-num-good :num-good
+repeat :num-good [spawn-good]
 end
 
 ;Spawns bad characters
-to spawn-bad :num-bad
-spawn-initial-bad
-repeat :num-bad [spawn-more-bad]
+to spawn-num-bad :num-bad
+repeat :num-bad [spawn-bad]
 end
 
 
 ; spawns an intial good turtle which will be cloned
-to spawn-initial-good
-newturtle "good
+to spawn-good
+importturtle "good.mwa
 setx random 735     ;random from 0-734 which is world size
 sety random 427
 setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
-giveturtle "type
-settype "good       ;give the turtle a good type
 st
 end
 
-; spawns more good turtles
-to spawn-more-good
-clone "good
-setx random 735     ;random from 0-734 which is world size
-sety random 427
-setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
-settype "good       ;give the turtle a good type
-st
-end
+
 
 ; spawns an intial bad turtle which will be cloned
-to spawn-initial-bad
-newturtle "bad
+to spawn-bad
+importturtle "bad.mwa
 setx random 735     ;random from 0-734 which is world size
 sety random 427
 setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which represent good things
-giveturtle "type
-settype "bad        ;give the turtle a good type
 st
 forever [chase "main-char .1]
 end
 
-; spawns more bad turtles
-to spawn-more-bad
-clone "bad
-setx random 735     ;random from 0-734 which is world size
-sety random 427
-setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which represent good things
-settype "bad        ;give the turtle a good type
-st
-forever [chase "main-char .1]
-end
 
 ;;;;;;;;;;;;;;;;;;;;;;END SPAWN PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
