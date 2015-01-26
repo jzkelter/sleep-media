@@ -14,7 +14,7 @@ end
 
 to play-game
 breishis
-launch [ forever [move-char 5] ]
+launch [ forever [move-char .1] ]
 launch [ forever [ keep-time ] ]
 end
 
