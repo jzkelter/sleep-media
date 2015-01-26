@@ -3,6 +3,8 @@ to breishis
 spawn-creatures
 make "hours-left 16
 make "secs-in-hour 2
+make "energy 90
+make "happiness 30
 change-clock ;;reset the clock
 resett
 
@@ -62,8 +64,6 @@ newturtle "main-char
 setx 0
 sety 0
 st
-giveturtle "energy
-giveturtle "happiness
 ;when [touching? who ] [affect-me]
 end
 
@@ -183,57 +183,72 @@ end
 ;;;;;;;;;;;;;;;;ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
 to make-energy-happiness-bars
 newturtle "energy-tracker
-setx -367
+setx minus (first projectsize) / 2
 sety 200
 setc 85
 st
 rt 90
 setpensize 25
 pd
-fd 500
+fd .8 * first projectsize
 
 newturtle "happy-tracker
-setx -367
+setx minus (first projectsize) / 2
 sety 170
 setc 45
 st
 rt 90
 setpensize 25
 pd
-fd 150
+fd .3 * first projectsize
 
 end
 
 
 to increase-happiness :ammount
-ask "happy-tracker [
+make "happiness :happiness + :ammount   ;increase global happiness
+
+ask "happy-tracker [                        ;change the happiness bar
     setc 45
-    fd :ammount
+    fd (:ammount / 100) * first projectsize
 ]
 end
 
 
 to decrease-happiness :ammount
+make "happiness :happiness - :ammount - 1   ;decrease global happiness
+
 ask "happy-tracker [
     setc 0
-    bk :ammount + 1
+    bk 1 + (:ammount / 100) * first projectsize 
 ]
 increase-happiness 1
 end
 
 
 to increase-energy :ammount
+if (:energy + :ammount) > 100 [
+    let [ammount 100 - :energy]
+]
+show :ammount
+make "energy :energy + :ammount     ;increase global energy
+
 ask "energy-tracker [
     setc 85
-    fd :ammount
+    fd (:ammount / 100) * first projectsize
 ]
 end
 
 
 to decrease-energy :ammount
+if (:energy - :ammount) < 0[
+    let [ammount :energy]
+]
+
+make "energy :energy - :ammount - 1 ;decrease global energy
 ask "energy-tracker [
     setc 0
-    bk :ammount + 1
+    bk 1 + (:ammount / 100) * first projectsize 
 ]
 increase-energy 1
 end
