@@ -1,26 +1,34 @@
 ;This is the setup procedure
 to breishis
+getpage "page1
 spawn-creatures
 make "hours-left 16
 make "secs-in-hour 2
 make "energy 90
 make "happiness 30
+make "acnePlayed? "false
+make "sicknessPlayed? "false
+make "obesityPlayed? "false
+make "carAccidentPlayed? "false
 change-clock ;;reset the clock
 resett
-
 make-energy-happiness-bars
 end
 
 
-
+to reset
+everyone [remove who]
+end
 
 to play-game
 breishis
+game-loop
+end
+
+to game-loop
 launch [ forever [move-char .1] ]
 launch [ forever [ keep-time ] ]
 end
-
-
 
 ;moves the char in a certain heading a certain distance :speed
 to move-char :speed
@@ -36,6 +44,7 @@ main-char,
     if (ascii :key) = 31        ;;if left arrow key is pressed
         [seth 180 fd :speed]
 ]
+main-char,
 fd :speed
 end
 
@@ -61,19 +70,68 @@ end
 ; Spawns the main character in the beginning
 to spawn-you
 newturtle "main-char
+giveturtle "type
 setx 0
 sety 0
 st
 end
 
 to do-good
-announce [Good has been done!]
 remove who
+increase-happiness 20
 end
 
-to do-bad
-announce [Bad has been done]
-remove who
+;this function is called from onTouching which reduces energy and plays a video if it hasn't played before
+to do-bad :shape
+ht          ;hides the bad turtle
+decrease-happiness 20
+pause-game  ;pause all processes
+play-movie  ;plays the correct movie
+unpause-game
+end
+
+
+to play-movie
+if and (shape = "acne) not :acnePlayed?
+     [
+    make "acnePlayed? "true
+    getpage "acne
+    acne_mov4
+    getpage "page1
+    ]
+if and (shape = "carAccident) not :carAccidentPlayed?
+     [
+    make "carAccidentPlayed? "true
+    getpage "carAccident
+    carAccident_mov4
+    getpage "page1
+]
+if and (shape = "sickness) not :sicknessPlayed?
+    [
+    make "sicknessPlayed? "true
+    getpage "sickness
+    sickness_mov4
+    getpage "page1
+]
+
+if and (shape = "obesity) not :obesityPlayed?
+         [
+    make "obesityPLayed? "true
+    getpage "obesity
+    obesity_mov4
+    getpage "page1
+]
+end
+
+to unpause-game
+game-loop
+everyone [ if type = "bad [forever [chase "main-char .1]]]
+end
+
+to pause-game
+cancel [keep-time]
+cancel [move-char .1]
+everyone [ if type = "bad [cancel [chase "main-char .1]]]
 end
 
 ;Spawns good characters
@@ -158,6 +216,7 @@ end
 ;;;;;;;;;;;;;;;;ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
 to make-energy-happiness-bars
 newturtle "energy-tracker
+giveturtle "type
 setx minus (first projectsize) / 2
 sety 200
 setc 85
@@ -168,6 +227,7 @@ pd
 fd .8 * first projectsize
 
 newturtle "happy-tracker
+giveturtle "type
 setx minus (first projectsize) / 2
 sety 170
 setc 45
