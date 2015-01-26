@@ -1,37 +1,44 @@
 ;This is the setup procedure
 to breishis
-spawn-creatures
+
 make "hours-left 16
 make "secs-in-hour 2
 change-clock ;;reset the clock
 resett
 
-
+make-energy-happiness-bars
 end
 
 
 
 
 to play-game
-breishis
-launch [ forever [move-char 5] ]
+spawn-creatures
+launch [ forever [wait 1 move-char 5] ]
+; launch [forever [wait 50 / level spawn_more]]
+launch [forever [ask "t1 [wait 1 chase "t2 5] ] ]
 launch [ forever [ keep-time ] ]
+
 end
 
 
 
 ;moves the char in a certain heading a certain distance :speed
 to move-char :speed
-main-char,
-let [key readchar]
-if (ascii :key) = 28        ;;if left arrow key is pressed
-    [seth 270 fd :speed]
-if (ascii :key) = 29        ;;if right arrow key is pressed
-    [seth 90 fd :speed]
-if (ascii :key) = 30        ;;if forward key is pressed
-    [seth 0 fd :speed]
-if (ascii :key) = 31        ;;if left arrow key is pressed
-    [seth 180 fd :speed]
+if key? [
+    let [key readchar]
+    if (ascii :key) = 28        ;;if left arrow key is pressed
+        [seth 270]
+    if (ascii :key) = 29        ;;if right arrow key is pressed
+            [seth 90]
+    if (ascii :key) = 30        ;;if forward key is pressed
+        [seth 0]
+    if (ascii :key) = 31        ;;if left arrow key is pressed
+        [seth 180]
+]
+
+fd :speed
+
 end
 
 
@@ -40,8 +47,6 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;HELPER FUNCTIONS;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 
 
 
@@ -61,7 +66,7 @@ sety 0
 st
 giveturtle "energy
 giveturtle "happiness
-;when [touching? who ] [affect-me]
+;when [touching?] [affect-me]
 end
 
 to affect-me
@@ -83,8 +88,9 @@ end
 ;Spawns bad characters
 to spawn-bad :num-bad
 spawn-initial-bad
-repeat :num-bad [spawn-more-bad]
+repeat :num-bad [spawn-more-good]
 end
+
 
 
 ; spawns an intial good turtle which will be cloned
@@ -108,7 +114,7 @@ settype "good       ;give the turtle a good type
 st
 end
 
-; spawns an intial bad turtle which will be cloned
+; spawns an intial good turtle which will be cloned
 to spawn-initial-bad
 newturtle "bad
 setx random 735     ;random from 0-734 which is world size
@@ -117,10 +123,9 @@ setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which
 giveturtle "type
 settype "bad        ;give the turtle a good type
 st
-forever [chase "main-char .1]
 end
 
-; spawns more bad turtles
+; spawns more good turtles
 to spawn-more-bad
 clone "bad
 setx random 735     ;random from 0-734 which is world size
@@ -128,10 +133,9 @@ sety random 427
 setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which represent good things
 settype "bad        ;give the turtle a good type
 st
-forever [chase "main-char .1]
 end
 
-;;;;;;;;;;;;;;;;;;;;;;END SPAWN PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ; for finding ascii-key values
 to show-ascii
@@ -159,7 +163,7 @@ end
 
 ;Changes the time, and then changes the clock in the world
 to keep-time
-    wait (:secs-in-hour * 10)
+    wait (:secs-in-hour * 10) 
     make "hours-left (:hours-left - 1)      ;increment time
     change-clock                        ;change clock text
 
@@ -167,8 +171,7 @@ to keep-time
         announce [the day is over]
         stopall
     ]
-end
-
+end 
 
 to change-clock
 top                         ;move cursoe to top of page
@@ -176,3 +179,66 @@ repeat count clock [delete]     ;delete all text
 insert (se :hours-left "hours "left ;insert new text
 end
 ;;;;;;;;;;;END CLOCK PROCEDURES ;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
+to make-energy-happiness-bars
+newturtle "energy-tracker
+setx -367
+sety 200
+setc 85
+st
+rt 90
+setpensize 25
+pd
+fd 500
+
+newturtle "happy-tracker
+setx -367
+sety 170
+setc 45
+st 
+rt 90
+setpensize 25
+pd
+fd 150
+
+end
+
+
+to increase-happiness :ammount
+ask "happy-tracker [
+    setc 45
+    fd :ammount
+]
+end
+
+
+to decrease-happiness :ammount
+ask "happy-tracker [
+    setc 0
+    bk :ammount + 1
+]
+increase-happiness 1
+end
+
+
+to increase-energy :ammount
+ask "energy-tracker [
+    setc 85
+    fd :ammount
+]
+end
+
+
+to decrease-energy :ammount
+ask "energy-tracker [
+    setc 0
+    bk :ammount + 1
+]
+increase-energy 1
+end
+
+
+;;;;;;;;;;;;;;;;END ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
