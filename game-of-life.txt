@@ -38,6 +38,7 @@ if key? [
 ]
 
 fd :speed
+
 end
 
 
@@ -47,9 +48,43 @@ end
 ;;HELPER FUNCTIONS;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-to spawn-creatures
 
+
+;;;;;;;;;;;;;;;;;;;;;;BEGIN SPAWN PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to spawn-creatures
+spawn-you
+spawn-good 1        ;Spawns 1 + number you enter good creatues with type good
+spawn-bad 1     ;Spawns 1 + number you enter bad creatues with type bad
 end
+
+
+; Spawns the main character in the beginning
+to spawn-you
+newturtle "main-char
+setx 0
+sety 0
+st
+giveturtle "energy
+giveturtle "happiness
+;when [touching?] [affect-me]
+end
+
+to affect-me
+[if turtle = good
+        [add-happy
+        add-energy
+        remove-good
+    ]
+    else
+]
+end
+
+;Spawns good characters
+to spawn-good :num-good
+spawn-initial-good
+repeat :num-good [spawn-more-good]
+end
+
 
 
 ; spawns an intial good turtle which will be cloned
@@ -131,7 +166,6 @@ to keep-time
         stopall
     ]
 end 
-
 
 to change-clock
 top                         ;move cursoe to top of page
