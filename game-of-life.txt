@@ -61,7 +61,7 @@ sety 0
 st
 giveturtle "energy
 giveturtle "happiness
-;when [touching?] [affect-me]
+;when [touching? who ] [affect-me]
 end
 
 to affect-me
