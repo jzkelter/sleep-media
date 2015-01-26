@@ -22,19 +22,16 @@ end
 
 ;moves the char in a certain heading a certain distance :speed
 to move-char :speed
-if key? [
 main-char,
-    let [key readchar]
-    if (ascii :key) = 28        ;;if left arrow key is pressed
-        [seth 270]
-    if (ascii :key) = 29        ;;if right arrow key is pressed
-            [seth 90]
-    if (ascii :key) = 30        ;;if forward key is pressed
-        [seth 0]
-    if (ascii :key) = 31        ;;if left arrow key is pressed
-        [seth 180]
-]
-fd :speed
+let [key readchar]
+if (ascii :key) = 28        ;;if left arrow key is pressed
+    [seth 270 fd :speed]
+if (ascii :key) = 29        ;;if right arrow key is pressed
+    [seth 90 fd :speed]
+if (ascii :key) = 30        ;;if forward key is pressed
+    [seth 0 fd :speed]
+if (ascii :key) = 31        ;;if left arrow key is pressed
+    [seth 180 fd :speed]
 end
 
 
@@ -43,6 +40,9 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;HELPER FUNCTIONS;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;BEGIN SPAWN PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,6 +59,19 @@ newturtle "main-char
 setx 0
 sety 0
 st
+giveturtle "energy
+giveturtle "happiness
+;when [touching?] [affect-me]
+end
+
+to affect-me
+[if turtle = good
+        [add-happy
+        add-energy
+        remove-good
+    ]
+    else
+]
 end
 
 ;Spawns good characters
@@ -155,7 +168,6 @@ to keep-time
         stopall
     ]
 end
-
 
 
 to change-clock
