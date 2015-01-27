@@ -1,5 +1,6 @@
 ;This is the setup procedure
 to breishis
+reset
 getpage "page1
 spawn-creatures
 make "hours-left 16
@@ -16,9 +17,6 @@ make-energy-happiness-bars
 end
 
 
-to reset
-everyone [remove who]
-end
 
 to play-game
 breishis
@@ -26,7 +24,7 @@ game-loop
 end
 
 to game-loop
-launch [ forever [move-char .1] ]
+launch [ forever [ wait .5 move-char 5] ]
 launch [ forever [ keep-time ] ]
 end
 
@@ -36,13 +34,13 @@ if key? [
 main-char,
     let [key readchar]
     if (ascii :key) = 28        ;;if left arrow key is pressed
-        [seth 270 fd :speed]
+        [seth 270]
     if (ascii :key) = 29        ;;if right arrow key is pressed
-        [seth 90 fd :speed]
+        [seth 90]
     if (ascii :key) = 30        ;;if forward key is pressed
-        [seth 0 fd :speed]
+        [seth 0]
     if (ascii :key) = 31        ;;if left arrow key is pressed
-        [seth 180 fd :speed]
+        [seth 180]
 ]
 main-char,
 fd :speed
@@ -76,8 +74,46 @@ sety 0
 st
 end
 
+
+
+;Spawns good characters
+to spawn-num-good :num-good
+repeat :num-good [spawn-good]
+end
+
+;Spawns bad characters
+to spawn-num-bad :num-bad
+repeat :num-bad [spawn-bad]
+end
+
+
+; spawns an intial good turtle which will be cloned
+to spawn-good
+importturtle "good.mwa
+setx random 735     ;random from 0-734 which is world size
+sety random 427
+setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
+st
+end
+
+
+
+; spawns an intial bad turtle which will be cloned
+to spawn-bad
+importturtle "bad.mwa
+setx random 735     ;random from 0-734 which is world size
+sety random 427
+setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which represent good things
+st
+forever [wait .5 chase "main-char 5]
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;END SPAWN PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;OUTCOME PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to do-good
-remove who
+ht
 increase-happiness 20
 end
 
@@ -123,59 +159,35 @@ if and (shape = "obesity) not :obesityPlayed?
 ]
 end
 
-to unpause-game
-game-loop
-everyone [ if type = "bad [forever [chase "main-char .1]]]
-end
-
-to pause-game
-cancel [keep-time]
-cancel [move-char .1]
-everyone [ if type = "bad [cancel [chase "main-char .1]]]
-end
-
-;Spawns good characters
-to spawn-num-good :num-good
-repeat :num-good [spawn-good]
-end
-
-;Spawns bad characters
-to spawn-num-bad :num-bad
-repeat :num-bad [spawn-bad]
-end
-
-
-; spawns an intial good turtle which will be cloned
-to spawn-good
-importturtle "good.mwa
-setx random 735     ;random from 0-734 which is world size
-sety random 427
-setsh pick [love exercise money music]      ;pick a shape from 1-4 which represent good things
-st
-end
 
 
 
-; spawns an intial bad turtle which will be cloned
-to spawn-bad
-importturtle "bad.mwa
-setx random 735     ;random from 0-734 which is world size
-sety random 427
-setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which represent good things
-st
-forever [chase "main-char .1]
-end
+;;;;;;;;;;;;;;;;;;;;;;END OUTCOME PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;;;;;;;;;;;;;;;;;;;;;;END SPAWN PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;;;;;;;;;;;;;;;;;;;;;;HANDY UTILITIES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; for finding ascii-key values
 to show-ascii
 let [key readchar]
     show ascii :key
 end
 
+to reset
+newturtle "cleaner
+cg
+everyone [remove who]
+end
 
+to unpause-game
+game-loop
+everyone [ if type = "bad [forever [wait .5 chase "main-char 5]]]
+end
+
+to pause-game
+cancel [keep-time]
+cancel [wait .5 move-char 5]
+everyone [ if type = "bad [cancel [wait .5 chase "main-char 5]]]
+end
 
 ;turtle chases the chasee with speed :speed
 to chase :chasee :speed
@@ -189,6 +201,7 @@ ifelse (:speed > :dis)      ; if the turtle is close than speed
 
 end
 
+;;;;;;;;;;;;;;;;;;;;;;END HANDY UTILITIES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;;;;;;;;CLOCK PROCEDURES;;;;;;;;;;;;;;;;;
