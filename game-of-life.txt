@@ -1,9 +1,15 @@
+to startup
+presentationmode
+welcome
+sleepHoursSelection
+end
+
 ;This is the setup procedure
 to breishis
 reset
 getpage "page1
 spawn-creatures
-make "hours-left 16
+make "hours-left 24 - hoursOfSleep
 make "secs-in-hour 2
 make "energy 90
 make "happiness 30
@@ -28,6 +34,41 @@ launch [ forever [ wait .5 move-char 5] ]
 launch [ forever [ keep-time ] ]
 end
 
+to play-another-round
+main-char,
+remove-old-creatures
+spawn-new-round-creatures
+new-round-clock
+wait 5
+game-loop
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;HELPER PROCEDURES;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;NEW ROUNDS PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;
+;Removes all good and bad hidden turtles of the previous round
+to remove-old-creatures
+everyone [if or type = "bad type = "good [remove who] ]
+end
+
+;spawns new good and bad creatures
+to spawn-new-round-creatures
+spawn-num-good 2
+spawn-num-bad 2
+end
+
+to new-round-clock
+make "hours-left 24 - hoursOfSleep
+end
+
+;;;;;;;;;;;;;END OF NEW ROUNDS PROCEUDRES;;;;;;;;;;;;;;;
+
+
 ;moves the char in a certain heading a certain distance :speed
 to move-char :speed
 if key? [
@@ -46,12 +87,6 @@ main-char,
 fd :speed
 end
 
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;HELPER FUNCTIONS;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -179,6 +214,7 @@ everyone [remove who]
 end
 
 to unpause-game
+wait 5
 game-loop
 everyone [ if type = "bad [forever [wait .5 chase "main-char 5]]]
 end
@@ -211,18 +247,22 @@ to keep-time
     wait (:secs-in-hour * 10)
     make "hours-left (:hours-left - 1)      ;increment time
     change-clock                        ;change clock text
+    decrease-energy 2
 
     if (:hours-left = 0) [
-        announce [the day is over]
-        stopall
+        sleepHoursSelection     ; popup a dialog box asking how much sleep you want
+       ; sleep-screen       ;go to sleep visualization function
+    play-another-round
     ]
 end
 
 
 to change-clock
-top                         ;move cursoe to top of page
+ask "clock [
+top                         ;move cursor to top of page
 repeat count clock [delete]     ;delete all text
 insert (se :hours-left "hours "left ;insert new text
+]
 end
 ;;;;;;;;;;;END CLOCK PROCEDURES ;;;;;;;;;;;;;;;;;;
 
@@ -278,7 +318,6 @@ to increase-energy :ammount
 if (:energy + :ammount) > 100 [
     let [ammount 100 - :energy]
 ]
-show :ammount
 make "energy :energy + :ammount     ;increase global energy
 
 ask "energy-tracker [
