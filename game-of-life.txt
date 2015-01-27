@@ -7,9 +7,9 @@ end
 ;This is the setup procedure
 to breishis
 reset
+make-energy-happiness-turtles
 getpage "page1
 spawn-creatures
-
 make "hours-left 24 - hours-of-sleep
 make "secs-in-hour 2
 make "energy 90
@@ -18,7 +18,7 @@ make "acnePlayed? "false
 make "sicknessPlayed? "false
 make "obesityPlayed? "false
 make "carAccidentPlayed? "false
-change-clock ;;reset the clock
+change-clock :hours-left ;;reset the clock
 resett
 make-energy-happiness-bars
 end
@@ -85,7 +85,7 @@ main-char,
         [seth 180]
 ]
 main-char,
-fd :speed
+fd :speed * (:energy / 80)
 end
 
 
@@ -209,6 +209,7 @@ let [key readchar]
 end
 
 to reset
+clearnames
 newturtle "cleaner
 cg
 everyone [remove who]
@@ -277,7 +278,7 @@ to change-clock :hours
 ask "clock [
     top                         ;move cursoe to top of page
     repeat count clock [delete]     ;delete all text
-    insert (se :hours "hours "left ;insert new text
+    insert (se :hours "hours "left) ;insert new text
 ]
 end
 ;;;;;;;;;;;END CLOCK PROCEDURES ;;;;;;;;;;;;;;;;;;
@@ -330,7 +331,7 @@ make "happiness :happiness + :ammount   ;increase global happiness
 
 ask "happy-tracker [                        ;change the happiness bar
     setc 45
-    glide ((:ammount / 100) * first projectsize) 0.1
+    fd (:ammount / 100) * first projectsize
 ]
 end
 
@@ -340,7 +341,7 @@ make "happiness :happiness - :ammount - 1   ;decrease global happiness
 
 ask "happy-tracker [
     setc 0
-    glide (minus 1 + (:ammount / 100) * first projectsize) 0.1
+    fd minus 1 + (:ammount / 100) * first projectsize
 ]
 increase-happiness 1
 end
@@ -355,12 +356,12 @@ make "energy :energy + :ammount     ;increase global energy
 
 ask "energy-tracker [
     setc 85
-    glide ((:ammount / 100) * first projectsize) .1
+    glide ( (:ammount / 100) * first projectsize ) .1
 ]
 end
 
 
-to decrease-energy :ammount 
+to decrease-energy :ammount
 if (:energy - :ammount) < 0[
     let [ammount :energy]
 ]
@@ -443,7 +444,7 @@ wave 1 25 170 30
 end
 
 to k-complex
-let [down (60 + random 40) 
+let [down (60 + random 40)
     up (160 + random 80)
     prevy ycor]
 rt 170
@@ -468,7 +469,7 @@ change-sleep-stage-text (se "Slow "Wave "Sleep)
     setheading 180
     repeat (:amp / :scaler) [fd (1 * :scaler) lt (:scaler * ((random 5) / 10 -  .1))]
 
-SWS         ;recursive procedure if it hasn't reached the end of the world 
+SWS         ;recursive procedure if it hasn't reached the end of the world
 end
 
 to REM
@@ -495,12 +496,12 @@ lt (180 - :angle - 5) / 2
 end
 
 to reset-sleep-graph
-cg                      
+cg
 
 make-energy-happiness-bars
 
 ask "sleepwave [
-    pu 
+    pu
     setc 1
     setx 30 -  (first projectsize) / 2
     pd
