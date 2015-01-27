@@ -1,3 +1,9 @@
+to startup
+presentationmode
+welcome
+sleepHoursSelection
+end
+
 ;This is the setup procedure
 to breishis
 reset
@@ -19,13 +25,49 @@ end
 
 
 
-
 to play-game
 breishis
-launch [ forever [move-char .1] ]
+game-loop
+end
+
+to game-loop
+launch [ forever [ wait .5 move-char 5] ]
 launch [ forever [ keep-time ] ]
 end
 
+to play-another-round
+main-char,
+remove-old-creatures
+spawn-new-round-creatures
+new-round-clock
+wait 5
+game-loop
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;HELPER PROCEDURES;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;NEW ROUNDS PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;
+;Removes all good and bad hidden turtles of the previous round
+to remove-old-creatures
+everyone [if or type = "bad type = "good [remove who] ]
+end
+
+;spawns new good and bad creatures
+to spawn-new-round-creatures
+spawn-num-good 2
+spawn-num-bad 2
+end
+
+to new-round-clock
+make "hours-left 24 - hours-of-sleep
+end
+
+;;;;;;;;;;;;;END OF NEW ROUNDS PROCEUDRES;;;;;;;;;;;;;;;
 
 
 ;moves the char in a certain heading a certain distance :speed
@@ -34,24 +76,18 @@ if key? [
 main-char,
     let [key readchar]
     if (ascii :key) = 28        ;;if left arrow key is pressed
-        [seth 270 fd :speed]
+        [seth 270]
     if (ascii :key) = 29        ;;if right arrow key is pressed
-        [seth 90 fd :speed]
+        [seth 90]
     if (ascii :key) = 30        ;;if forward key is pressed
-        [seth 0 fd :speed]
+        [seth 0]
     if (ascii :key) = 31        ;;if left arrow key is pressed
-        [seth 180 fd :speed]
+        [seth 180]
 ]
 main-char,
 fd :speed * (:energy / 80)
 end
 
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;HELPER FUNCTIONS;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -68,20 +104,13 @@ end
 ; Spawns the main character in the beginning
 to spawn-you
 newturtle "main-char
+giveturtle "type
 setx 0
 sety 0
 st
 end
 
-to do-good
-announce [Good has been done!]
-remove who
-end
 
-to do-bad
-announce [Bad has been done]
-remove who
-end
 
 ;Spawns good characters
 to spawn-num-good :num-good
@@ -112,18 +141,72 @@ setx random 735     ;random from 0-734 which is world size
 sety random 427
 setsh pick [acne carAccident obesity sickness]      ;pick a shape from 1-4 which represent good things
 st
-forever [chase "main-char .1]
+forever [wait .5 chase "main-char 5]
 end
 
 
 ;;;;;;;;;;;;;;;;;;;;;;END SPAWN PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;;;;;;;;;;OUTCOME PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to do-good
+ht
+increase-happiness 20
+end
+
+;this function is called from onTouching which reduces energy and plays a video if it hasn't played before
+to do-bad :shape
+ht          ;hides the bad turtle
+decrease-happiness 20
+pause-game  ;pause all processes
+play-movie  ;plays the correct movie
+unpause-game
+end
+
+
+to play-movie
+if and (shape = "acne) not :acnePlayed?
+     [
+    make "acnePlayed? "true
+    getpage "acne
+    acne_mov4
+    getpage "page1
+    ]
+if and (shape = "carAccident) not :carAccidentPlayed?
+     [
+    make "carAccidentPlayed? "true
+    getpage "carAccident
+    carAccident_mov4
+    getpage "page1
+]
+if and (shape = "sickness) not :sicknessPlayed?
+    [
+    make "sicknessPlayed? "true
+    getpage "sickness
+    sickness_mov4
+    getpage "page1
+]
+
+if and (shape = "obesity) not :obesityPlayed?
+         [
+    make "obesityPLayed? "true
+    getpage "obesity
+    obesity_mov4
+    getpage "page1
+]
+end
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;END OUTCOME PROCEDURES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;HANDY UTILITIES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; for finding ascii-key values
 to show-ascii
 let [key readchar]
     show ascii :key
 end
-
 
 to reset
 clearnames
@@ -132,7 +215,17 @@ cg
 everyone [remove who]
 end
 
+to unpause-game
+wait 5
+game-loop
+everyone [ if type = "bad [forever [wait .5 chase "main-char 5]]]
+end
 
+to pause-game
+cancel [keep-time]
+cancel [wait .5 move-char 5]
+everyone [ if type = "bad [cancel [wait .5 chase "main-char 5]]]
+end
 
 ;turtle chases the chasee with speed :speed
 to chase :chasee :speed
@@ -146,6 +239,7 @@ ifelse (:speed > :dis)      ; if the turtle is close than speed
 
 end
 
+;;;;;;;;;;;;;;;;;;;;;;END HANDY UTILITIES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;;;;;;;;CLOCK PROCEDURES;;;;;;;;;;;;;;;;;
@@ -156,9 +250,12 @@ to keep-time
     make "hours-left (:hours-left - 1)      ;increment time
     change-clock :hours-left                     ;change clock text
 
+    decrease-energy 2
+
     if (:hours-left = 0) [
-        announce [the day is over]
-        stopall
+        sleepHoursSelection     ; popup a dialog box asking how much sleep you want
+       ; sleep-screen       ;go to sleep visualization function
+    play-another-round
     ]
 end
 
@@ -189,8 +286,18 @@ end
 ;;;;;;;;;;;;;;;;ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
 to make-energy-happiness-turtles
 newturtle "energy-tracker
+giveturtle "type
+setx minus (first projectsize) / 2
+sety 200
+setc 85
 st
+
+
 newturtle "happy-tracker
+giveturtle "type
+setx minus (first projectsize) / 2
+sety 170
+setc 45
 st
 end
 
