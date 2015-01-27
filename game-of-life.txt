@@ -9,7 +9,8 @@ to breishis
 reset
 getpage "page1
 spawn-creatures
-make "hours-left 24 - hoursOfSleep
+
+make "hours-left 24 - hours-of-sleep
 make "secs-in-hour 2
 make "energy 90
 make "happiness 30
@@ -63,7 +64,7 @@ spawn-num-bad 2
 end
 
 to new-round-clock
-make "hours-left 24 - hoursOfSleep
+make "hours-left 24 - hours-of-sleep
 end
 
 ;;;;;;;;;;;;;END OF NEW ROUNDS PROCEUDRES;;;;;;;;;;;;;;;
@@ -246,7 +247,8 @@ end
 to keep-time
     wait (:secs-in-hour * 10)
     make "hours-left (:hours-left - 1)      ;increment time
-    change-clock                        ;change clock text
+    change-clock :hours-left                     ;change clock text
+
     decrease-energy 2
 
     if (:hours-left = 0) [
@@ -256,28 +258,39 @@ to keep-time
     ]
 end
 
+;changes the sleep time, then changes the clock
+to keep-sleep-time
+   wait (:secs-in-hour * 10)
+    make "hours-of-sleep (:hours-of-sleep - 1)      ;increment time
+    change-clock :hours-of-sleep                     ;change clock text
 
-to change-clock
+    increase-energy 4               ;increase energy for every hour asleep
+
+    if (:hours-of-sleep = 0) [
+        stopall
+    ]
+
+
+end
+
+to change-clock :hours
 ask "clock [
-top                         ;move cursor to top of page
-repeat count clock [delete]     ;delete all text
-insert (se :hours-left "hours "left ;insert new text
+    top                         ;move cursoe to top of page
+    repeat count clock [delete]     ;delete all text
+    insert (se :hours "hours "left ;insert new text
 ]
 end
 ;;;;;;;;;;;END CLOCK PROCEDURES ;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
-to make-energy-happiness-bars
+to make-energy-happiness-turtles
 newturtle "energy-tracker
 giveturtle "type
 setx minus (first projectsize) / 2
 sety 200
 setc 85
 st
-rt 90
-setpensize 25
-pd
-fd .8 * first projectsize
+
 
 newturtle "happy-tracker
 giveturtle "type
@@ -285,11 +298,30 @@ setx minus (first projectsize) / 2
 sety 170
 setc 45
 st
-rt 90
-setpensize 25
-pd
-fd .3 * first projectsize
+end
 
+to make-energy-happiness-bars
+ask "energy-tracker [
+    pu
+    setx minus (first projectsize) / 2
+    sety 200
+    setc 85
+    seth 90
+    setpensize 25
+    pd
+    fd (:energy / 100) * first projectsize
+]
+
+ask "happy-tracker [
+    pu
+    setx minus (first projectsize) / 2
+    sety 170
+    setc 45
+    seth 90
+    setpensize 25
+    pd
+    fd (:happiness / 100) * first projectsize
+]
 end
 
 
@@ -298,7 +330,7 @@ make "happiness :happiness + :ammount   ;increase global happiness
 
 ask "happy-tracker [                        ;change the happiness bar
     setc 45
-    fd (:ammount / 100) * first projectsize
+    glide ((:ammount / 100) * first projectsize) 0.1
 ]
 end
 
@@ -308,7 +340,7 @@ make "happiness :happiness - :ammount - 1   ;decrease global happiness
 
 ask "happy-tracker [
     setc 0
-    bk 1 + (:ammount / 100) * first projectsize
+    glide (minus 1 + (:ammount / 100) * first projectsize) 0.1
 ]
 increase-happiness 1
 end
@@ -318,16 +350,17 @@ to increase-energy :ammount
 if (:energy + :ammount) > 100 [
     let [ammount 100 - :energy]
 ]
+
 make "energy :energy + :ammount     ;increase global energy
 
 ask "energy-tracker [
     setc 85
-    fd (:ammount / 100) * first projectsize
+    glide ((:ammount / 100) * first projectsize) .1
 ]
 end
 
 
-to decrease-energy :ammount
+to decrease-energy :ammount 
 if (:energy - :ammount) < 0[
     let [ammount :energy]
 ]
@@ -335,10 +368,151 @@ if (:energy - :ammount) < 0[
 make "energy :energy - :ammount - 1 ;decrease global energy
 ask "energy-tracker [
     setc 0
-    bk 1 + (:ammount / 100) * first projectsize
+    glide (minus 1 + (:ammount / 100) * first projectsize) 0.1
 ]
 increase-energy 1
 end
 
 
 ;;;;;;;;;;;;;;;;END ENERGY/HAPPINESS BAR PROCEDURES;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;SLEEPING PROCEDURES::::::::::::::::::::::::::
+to draw-sleep-wave
+make-energy-happiness-turtles   ;make the turtles to draw bars
+change-clock :hours-of-sleep        ;reset the clock
+
+newturtle "sleepwave            ;make the turtle to draw sleepwaves
+st
+
+reset-sleep-graph
+
+launch [forever [keep-sleep-time]]
+relaxed-wakefulness
+reset-sleep-graph
+stage-1
+reset-sleep-graph
+
+launch [forever [sleep-cycle]]
+
+end
+
+to sleep-cycle
+if (:hours-of-sleep < 1) [stop]
+    stage-2
+    reset-sleep-graph
+    pu fd 70 pd         ;move foward to not overshoot stop condition
+    SWS
+    reset-sleep-graph
+    stage-2
+    reset-sleep-graph
+    REM
+    reset-sleep-graph
+    sleep-cycle
+end
+
+to relaxed-wakefulness
+change-sleep-stage-text (se "Relaxed "Wakefulness)
+repeat 4 [
+wave 1 (10 + random 10) 160 10
+wave 1 (5 + random 10) 160 5
+]
+
+end
+
+to stage-1
+change-sleep-stage-text (se "Stage "1)
+repeat 4[
+wave 1 (5 + random 10) 160 10
+wave 1 14 145 15
+]
+end
+
+to stage-2
+change-sleep-stage-text (se "Stage "2)
+repeat 2[
+wave 1 7 145 20
+sleep-spindle
+wave 1 4 145 20
+k-complex
+]
+end
+
+to sleep-spindle
+wave 1 25 170 30
+end
+
+to k-complex
+let [down (60 + random 40) 
+    up (160 + random 80)
+    prevy ycor]
+rt 170
+repeat :down [fd 1 lt .2]
+lt 160
+repeat :up [fd 1 rt .1]
+setheading 180
+repeat (:down + :up) [fd 1 lt .05]
+setheading 0
+fd :prevy - ycor
+end
+
+to SWS
+if (xcor < (100 - ((first projectsize) / 2)))  [stop]       ;stopping condition
+
+change-sleep-stage-text (se "Slow "Wave "Sleep)
+
+
+    let [amp random 240 + 10 scaler 2]
+    seth 5
+    repeat (:amp / :scaler) [fd (1 * :scaler) rt (:scaler  * ((random 5) / 10 - .1))]
+    setheading 180
+    repeat (:amp / :scaler) [fd (1 * :scaler) lt (:scaler * ((random 5) / 10 -  .1))]
+
+SWS         ;recursive procedure if it hasn't reached the end of the world 
+end
+
+to REM
+if (xcor < (25 - ((first projectsize) / 2)))  [stop]
+change-sleep-stage-text (se "REM "-Dream "Sleep)
+
+wave 1 1 140 (1 + random 15)
+
+REM
+end
+
+to wave :speed :repeat :angle :amp
+rt (180 - :angle - 5) / 2
+let [speed (2 * :speed)]
+repeat :repeat [
+    let [ramp random :amp]
+    let [rangle random 11]
+    glide :amp + :ramp  :speed
+    rt :angle + :rangle
+    glide :amp + :ramp :speed
+    lt :angle + :rangle
+]
+lt (180 - :angle - 5) / 2
+end
+
+to reset-sleep-graph
+cg                      
+
+make-energy-happiness-bars
+
+ask "sleepwave [
+    pu 
+    setc 1
+    setx 30 -  (first projectsize) / 2
+    pd
+]
+
+end
+
+to change-sleep-stage-text :stage
+ask "sleep-stage [
+    top                                         ;move cursoe to top of page
+    repeat count sleep-stage [delete]     ;delete all text
+    insert :stage               ;insert new text
+]
+end
+;;;;;;;;;;;;;;;;;;;;;;;;;;END SLEEPING PROCEDURES::::::::::::::::::::::::::
