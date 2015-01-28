@@ -2,6 +2,7 @@ to startup
 presentationmode
 welcome
 sleepHoursSelection
+play-game
 end
 
 ;This is the setup procedure
@@ -10,7 +11,8 @@ reset
 make-energy-happiness-turtles
 getpage "page1
 spawn-creatures
-make "hours-left 24 - hours-of-sleep
+make "hours-of-sleep sleep-reporter
+make "hours-left 24 - sleep-reporter
 make "secs-in-hour 2
 make "energy 90
 make "happiness 30
@@ -36,10 +38,9 @@ launch [ forever [ keep-time ] ]
 end
 
 to play-another-round
-main-char,
+getpage "page1
 remove-old-creatures
 spawn-new-round-creatures
-new-round-clock
 wait 5
 game-loop
 end
@@ -64,7 +65,8 @@ spawn-num-bad 2
 end
 
 to new-round-clock
-make "hours-left 24 - hours-of-sleep
+make "hours-left 24 - sleep-reporter
+make "hours-of-sleep sleep-reporter
 end
 
 ;;;;;;;;;;;;;END OF NEW ROUNDS PROCEUDRES;;;;;;;;;;;;;;;
@@ -154,9 +156,10 @@ increase-happiness 20
 end
 
 ;this function is called from onTouching which reduces energy and plays a video if it hasn't played before
-to do-bad :shape
+to do-bad
 ht          ;hides the bad turtle
 decrease-happiness 20
+cancel [keep-time]
 pause-game  ;pause all processes
 play-movie  ;plays the correct movie
 unpause-game
@@ -222,8 +225,9 @@ everyone [ if type = "bad [forever [wait .5 chase "main-char 5]]]
 end
 
 to pause-game
-cancel [keep-time]
-cancel [wait .5 move-char 5]
+;show "game-paused
+ask "main-char [
+cancel [wait .5 move-char 5] ]
 everyone [ if type = "bad [cancel [wait .5 chase "main-char 5]]]
 end
 
@@ -253,9 +257,11 @@ to keep-time
     decrease-energy 2
 
     if (:hours-left = 0) [
+    pause-game
         sleepHoursSelection     ; popup a dialog box asking how much sleep you want
-       ; sleep-screen       ;go to sleep visualization function
-    play-another-round
+    new-round-clock
+        draw-sleep-wave
+    cancel [keep-time]
     ]
 end
 
@@ -268,7 +274,10 @@ to keep-sleep-time
     increase-energy 4               ;increase energy for every hour asleep
 
     if (:hours-of-sleep = 0) [
-        stopall
+    cancel [sleep-sound]
+    cancel [sleep-cycle]
+    play-another-round
+    cancel [keep-sleep-time]
     ]
 
 
@@ -380,6 +389,10 @@ end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;SLEEPING PROCEDURES::::::::::::::::::::::::::
 to draw-sleep-wave
+getpage "sleep
+launch [sleep-sound]
+cg
+everyone [remove who]
 make-energy-happiness-turtles   ;make the turtles to draw bars
 change-clock :hours-of-sleep        ;reset the clock
 
